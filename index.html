@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Temporal Oracle — A time machine for calibration training. Step into genuine historical fog-of-war, forecast outcomes, and track your epistemic calibration.">
+  <title>Temporal Oracle — Calibration Time Machine</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔮</text></svg>">
+</head>
+<body>
+
+  <!-- ════════════════════════════════════════════
+       LANDING VIEW
+       ════════════════════════════════════════════ -->
+  <div id="view-landing" class="view active">
+    <div class="landing-hero">
+      <div class="landing-logo">Temporal <span>Oracle</span></div>
+      <div class="landing-tagline">
+        Step into the past. Forecast the future. Measure your mind.
+      </div>
+
+      <div class="landing-stats" id="landing-stats">
+        <div class="stat-card">
+          <div class="stat-value" id="stat-predictions">0</div>
+          <div class="stat-label">Predictions</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-brier">—</div>
+          <div class="stat-label">Brier Score</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-streak">0</div>
+          <div class="stat-label">Day Streak</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-achievements">0</div>
+          <div class="stat-label">Achievements</div>
+        </div>
+      </div>
+
+      <div class="mode-grid" id="mode-grid">
+        <div class="mode-card" data-mode="freeplay" id="mode-freeplay">
+          <span class="mode-emoji">🕰️</span>
+          <div class="mode-title">Free Play</div>
+          <div class="mode-desc">Random historical scenarios. Spaced repetition targets your weak spots.</div>
+        </div>
+        <div class="mode-card" data-mode="daily" id="mode-daily">
+          <span class="mode-emoji">📰</span>
+          <div class="mode-title">Daily Challenge</div>
+          <div class="mode-desc">Same scenario for everyone today. Come back tomorrow for a new one.</div>
+        </div>
+        <div class="mode-card" data-mode="drill" id="mode-drill">
+          <span class="mode-emoji">⚡</span>
+          <div class="mode-title">Calibration Drill</div>
+          <div class="mode-desc">10 rapid-fire scenarios. Quick, focused calibration practice.</div>
+        </div>
+        <div class="mode-card" data-mode="extremes" id="mode-extremes">
+          <span class="mode-emoji">🎯</span>
+          <div class="mode-title">Extremes Training</div>
+          <div class="mode-desc">Scenarios requiring high confidence. Train your 90%+ and 10%- calls.</div>
+        </div>
+      </div>
+
+      <div class="filter-bar" id="filter-bar">
+        <div class="filter-chip active" data-difficulty="all">All Difficulty</div>
+        <div class="filter-chip" data-difficulty="easy">Easy</div>
+        <div class="filter-chip" data-difficulty="medium">Medium</div>
+        <div class="filter-chip" data-difficulty="hard">Hard</div>
+      </div>
+
+      <div class="filter-bar" id="category-bar">
+        <div class="filter-chip active" data-category="all">All Topics</div>
+        <div class="filter-chip" data-category="politics">🗳️ Politics</div>
+        <div class="filter-chip" data-category="economics">📈 Economics</div>
+        <div class="filter-chip" data-category="tech">💻 Tech</div>
+        <div class="filter-chip" data-category="science">🔬 Science</div>
+        <div class="filter-chip" data-category="geopolitics">🌍 Geopolitics</div>
+      </div>
+
+      <button class="btn btn-secondary mt-2" id="btn-dashboard" style="position:relative;z-index:1">
+        📊 View Dashboard
+      </button>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════
+       SCENARIO VIEW — THE NEWSROOM
+       ════════════════════════════════════════════ -->
+  <div id="view-scenario" class="view">
+    <!-- Drill progress bar -->
+    <div class="drill-progress hidden" id="drill-progress">
+      <div class="drill-bar" id="drill-bar"></div>
+      <div class="drill-label" id="drill-label"></div>
+    </div>
+
+    <!-- News ticker -->
+    <div class="news-ticker" id="news-ticker">
+      <div class="ticker-label">BREAKING</div>
+      <div class="ticker-track" id="ticker-track"></div>
+    </div>
+
+    <!-- Masthead -->
+    <div class="masthead" id="masthead">
+      <div class="masthead-title">Temporal Oracle — Historical Briefing</div>
+      <div class="masthead-date" id="masthead-date"></div>
+      <div class="masthead-subtitle" id="masthead-subtitle"></div>
+      <div class="chain-badge hidden" id="chain-badge"></div>
+    </div>
+
+    <!-- Fog-of-war control -->
+    <div class="fog-control" id="fog-control">
+      <div class="fog-slider-container">
+        <span class="fog-label">🌫️ Fog of War</span>
+        <input type="range" class="fog-slider" id="fog-slider" min="0" max="100" value="0">
+        <span class="fog-value" id="fog-value">0%</span>
+      </div>
+    </div>
+
+    <!-- Scenario body -->
+    <div class="scenario-body" id="scenario-body">
+      <!-- Context column -->
+      <div class="context-section" id="context-section">
+        <div class="section-label">Intelligence Briefing</div>
+        <div class="context-text" id="context-text"></div>
+
+        <!-- Stock chart -->
+        <div class="stock-chart-container hidden" id="stock-chart-container">
+          <div class="stock-label" id="stock-label"></div>
+          <canvas class="stock-chart" id="stock-chart"></canvas>
+        </div>
+
+        <!-- Base rate -->
+        <div class="base-rate-toggle hidden" id="base-rate-toggle" role="button">
+          📊 Show Base Rate
+        </div>
+        <div class="base-rate-content" id="base-rate-content"></div>
+      </div>
+
+      <!-- Wiki column -->
+      <div class="wiki-section" id="wiki-section">
+        <div class="section-label">Reference Material</div>
+        <div class="wiki-panel" id="wiki-panel">
+          <div class="wiki-header">
+            <svg class="wiki-header-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12.09 13.119c-.936 1.932-2.217 4.548-2.853 5.728-.616 1.074-1.127.931-1.532.029-1.406-3.321-4.293-9.144-5.651-12.409-.251-.601-.441-.987-.619-1.139-.181-.15-.554-.24-1.122-.271C.103 5.033 0 4.982 0 4.898v-.455l.052-.045c.924-.005 5.401 0 5.401 0l.051.045v.434c0 .119-.075.176-.225.176l-.564.031c-.485.029-.727.164-.727.436 0 .135.053.33.166.601 1.082 2.646 4.818 10.521 4.818 10.521l2.681-5.478-2.354-4.965c-.291-.615-.479-.99-.564-1.12-.089-.135-.278-.24-.564-.314-.286-.075-.567-.121-.848-.137-.076-.008-.114-.062-.114-.167v-.451l.057-.044h4.963l.056.044v.434c0 .119-.075.183-.226.183-.3.006-.528.063-.683.167-.154.104-.184.25-.087.438l1.264 2.845 1.312-2.67c.144-.301.144-.501-.004-.601-.149-.1-.446-.163-.891-.189-.075-.008-.112-.062-.112-.167v-.451l.056-.044c.56.005 3.78 0 3.78 0l.055.044v.434c0 .093-.056.156-.167.183-.378.082-.657.183-.836.306-.18.124-.42.449-.723.976l-1.995 3.907 2.545 5.347s3.916-8.412 4.577-9.809c.274-.573.18-.864-.012-1.025-.192-.161-.548-.271-1.071-.328-.113-.012-.17-.062-.17-.167v-.451l.057-.044h4.247l.055.044v.434c0 .093-.056.15-.17.17-.485.075-.856.209-1.108.398-.251.189-.541.571-.872 1.144L17.07 13.105l-2.461 5.161c-.591 1.215-1.076 1.057-1.449.105L10.545 13.12h1.545z"/></svg>
+            <span class="wiki-header-text">
+              Wikipedia — <strong id="wiki-date-label">as of date</strong>
+            </span>
+          </div>
+          <div class="wiki-content" id="wiki-content">
+            <div class="wiki-loading">
+              <div class="spinner"></div>
+              Loading historical article...
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Prediction panel -->
+    <div class="prediction-panel" id="prediction-panel">
+      <div class="prediction-card">
+        <div class="prediction-question" id="prediction-question"></div>
+        <div class="probability-input">
+          <div class="probability-display" id="probability-display">50</div>
+          <div class="probability-slider-track">
+            <input type="range" class="probability-slider" id="probability-slider" min="0" max="100" value="50">
+          </div>
+          <div class="probability-labels">
+            <span>Impossible</span>
+            <span>Coin Flip</span>
+            <span>Certain</span>
+          </div>
+          <button class="submit-prediction" id="submit-prediction">Lock In Prediction</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════
+       REVEAL VIEW
+       ════════════════════════════════════════════ -->
+  <div id="view-reveal" class="view">
+    <div class="reveal-container" id="reveal-container">
+      <!-- Outcome stamp -->
+      <div class="outcome-stamp-area">
+        <div class="outcome-stamp" id="outcome-stamp"></div>
+        <div class="outcome-question" id="reveal-question"></div>
+        <div class="outcome-answer" id="reveal-answer"></div>
+      </div>
+
+      <!-- Score breakdown -->
+      <div class="score-breakdown" id="score-breakdown"></div>
+
+      <!-- What actually happened -->
+      <div class="reveal-panel" id="panel-explanation">
+        <div class="reveal-panel-header">📜 What Actually Happened</div>
+        <div class="reveal-panel-body" id="explanation-body"></div>
+      </div>
+
+      <!-- Expert consensus -->
+      <div class="reveal-panel" id="panel-experts">
+        <div class="reveal-panel-header">🎙️ What The Experts Said</div>
+        <div class="reveal-panel-body" id="experts-body"></div>
+      </div>
+
+      <!-- Key signals -->
+      <div class="reveal-panel" id="panel-signals">
+        <div class="reveal-panel-header">🔍 Key Signals You Could Have Caught</div>
+        <div class="reveal-panel-body" id="signals-body"></div>
+      </div>
+
+      <!-- Cognitive biases -->
+      <div class="reveal-panel" id="panel-biases">
+        <div class="reveal-panel-header">🧠 Cognitive Biases at Play</div>
+        <div class="reveal-panel-body" id="biases-body"></div>
+      </div>
+
+      <!-- Wikipedia time-lapse -->
+      <div class="reveal-panel" id="panel-timelapse">
+        <div class="reveal-panel-header">📖 Wikipedia Time-Lapse — Watch History Get Written</div>
+        <div class="reveal-panel-body">
+          <div class="timelapse-container" id="timelapse-container">
+            <div class="wiki-loading">
+              <div class="spinner"></div>
+              Loading revision history...
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="reveal-actions" id="reveal-actions">
+        <button class="btn btn-primary" id="btn-next">Next Scenario →</button>
+        <button class="btn btn-share" id="btn-share-result">📤 Share Result</button>
+        <button class="btn btn-secondary" id="btn-back-home">← Back to Home</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════
+       DASHBOARD VIEW
+       ════════════════════════════════════════════ -->
+  <div id="view-dashboard" class="view">
+    <div class="dashboard-container">
+      <div class="dashboard-header">
+        <div class="dashboard-title">📊 Calibration Dashboard</div>
+        <div class="dashboard-nav">
+          <button class="btn btn-secondary" id="btn-dashboard-home">← Back</button>
+          <button class="btn btn-share" id="btn-share-dashboard">📤 Share</button>
+        </div>
+      </div>
+
+      <!-- Stats grid -->
+      <div class="dashboard-stats-grid" id="dashboard-stats"></div>
+
+      <!-- Charts -->
+      <div class="chart-grid" id="chart-grid">
+        <div class="chart-card">
+          <div class="chart-title">Calibration Curve</div>
+          <canvas class="chart-canvas" id="chart-calibration"></canvas>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Brier Score Over Time</div>
+          <canvas class="chart-canvas" id="chart-brier-timeline"></canvas>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Performance by Category</div>
+          <canvas class="chart-canvas" id="chart-category"></canvas>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Performance by Difficulty</div>
+          <canvas class="chart-canvas" id="chart-difficulty"></canvas>
+        </div>
+      </div>
+
+      <!-- Achievements -->
+      <div class="section-label mt-2">Achievements</div>
+      <div class="achievements-gallery" id="achievements-gallery"></div>
+
+      <!-- History -->
+      <div class="section-label mt-2">Prediction History</div>
+      <div class="history-container" id="history-container"></div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════
+       DRILL SUMMARY VIEW
+       ════════════════════════════════════════════ -->
+  <div id="view-drill-summary" class="view">
+    <div class="drill-summary" id="drill-summary-content"></div>
+  </div>
+
+  <!-- ════════════════════════════════════════════
+       SHARE MODAL
+       ════════════════════════════════════════════ -->
+  <div class="share-overlay hidden" id="share-overlay">
+    <div class="share-modal" id="share-modal">
+      <div class="chart-title">Your Calibration Report</div>
+      <div class="share-canvas-container">
+        <canvas id="share-canvas" width="600" height="400"></canvas>
+      </div>
+      <div class="reveal-actions" style="margin-top:1rem">
+        <button class="btn btn-primary" id="btn-download-share">💾 Download PNG</button>
+        <button class="btn btn-secondary" id="btn-close-share">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════
+       CONFETTI CONTAINER
+       ════════════════════════════════════════════ -->
+  <div class="confetti-container hidden" id="confetti-container"></div>
+
+  <!-- Scripts (order matters) -->
+  <script src="scenarios.js"></script>
+  <script src="wiki.js"></script>
+  <script src="scoring.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
